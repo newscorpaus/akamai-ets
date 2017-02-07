@@ -1,0 +1,38 @@
+<Macro AddOrigin $origin $port $alias $debug $geo>
+
+    <VirtualHost *:$port>
+
+        ServerName  localhost
+        ServerAlias $alias
+
+        <IfModule mod_esi.c>
+            ESI on
+            ESIDebugging $debug
+            GEO $geo
+        </IfModule>
+
+        <IfModule mod_proxy.c>
+
+            ProxyPass        / $origin timeout=5
+            ProxyPassReverse / $origin
+
+            # Add referrer hack (if the site uses referrer as security)
+            Header add referrer "$origin"
+
+            RequestHeader set referrer "$origin"
+            RequestHeader set Accept-Encoding gzip;q=0,deflate;q=0
+            RequestHeader add ndmesidebug "654321"
+
+            <Directory proxy:*>
+                Order allow,deny
+                Allow from all
+            </Directory>
+
+            SurrogateHeader Surrogate-Capability "ESI/1.0"
+            ChaseRedirects on
+
+        </IfModule>
+
+    </VirtualHost>
+
+</Macro>

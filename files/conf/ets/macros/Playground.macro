@@ -1,0 +1,29 @@
+<Macro Playground $name $debug $geo>
+
+    <VirtualHost $name.playground.ets:80>
+
+        ServerName $name.playground.ets
+
+        <IfModule mod_esi.c>
+            ESI on
+            ESIDebugging $debug
+            GEO $geo
+        </IfModule>
+
+        <IfModule mod_proxy.c>
+
+            ProxyPass        / http://localhost:3000/source/ timeout=5
+            ProxyPassReverse / http://localhost:3000/source/
+
+            <Directory proxy:*>
+                Order allow,deny
+                Allow from all
+            </Directory>
+
+            SurrogateHeader Surrogate-Capability "ESI/1.0"
+            ChaseRedirects on
+
+        </IfModule>
+    </VirtualHost>
+
+</Macro>

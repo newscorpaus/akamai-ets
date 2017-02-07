@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>ESI Playground</title>
+        <link rel="stylesheet" href="/assets/css/materialize.min.css">
+        <link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen" charset="utf-8">
+    </head>
+    <body>
+        <nav>
+            <div class="nav-wrapper blue-grey darken-3">
+                <a href="/" class="brand-logo">esi playground.</a>
+                <ul id="nav-mobile" class="right">
+                    <div class="switch">
+                        <label>
+                            <input id="toggle-debug" type="checkbox">
+                            <span class="lever"></span>
+                        </label>
+                    </div>
+                </ul>
+            </div>
+        </nav>
+        <div class="row">
+            <div class="col s6 source">
+                <div id="editor-source" class="fullheight"></div>
+            </div>
+            <div class="col s6">
+                <div id="panel-preview">
+                    <iframe id="preview" class="iframe fullheight"></iframe>
+                </div>
+                <div id="panel-debug" class="hide">
+                    <div id="editor-debug" class="fullheight"></div>
+                </div>
+             </div>
+        </div>
+        <footer class="page-footer blue-grey darken-3"></footer>
+        <script src="/assets/js/playground.min.js"></script>
+        <script>playground();</script>
+    </body>
+</html>

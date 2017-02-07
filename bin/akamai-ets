@@ -1,0 +1,102 @@
+#!/usr/bin/env node
+
+'use strict';
+
+process.title = 'akamai-ets';
+require('colors');
+
+const
+
+    yargs      = require('yargs'),
+    pick       = require('lodash/pick'),
+    parseQuery = require('querystring').parse,
+    url        = require('url'),
+
+    log   = require('../lib/cli/util/log'),
+    cli   = require('../lib/cli'),
+
+    intro = `
+  █████╗  ██╗  ██╗  █████╗  ███╗   ███╗  █████╗  ██╗    ███████╗ ████████╗ ███████╗
+ ██╔══██╗ ██║ ██╔╝ ██╔══██╗ ████╗ ████║ ██╔══██╗ ██║    ██╔════╝ ╚══██╔══╝ ██╔════╝
+ ███████║ █████╔╝  ███████║ ██╔████╔██║ ███████║ ██║    █████╗      ██║    ███████╗
+ ██╔══██║ ██╔═██╗  ██╔══██║ ██║╚██╔╝██║ ██╔══██║ ██║    ██╔══╝      ██║    ╚════██║
+ ██║  ██║ ██║  ██╗ ██║  ██║ ██║ ╚═╝ ██║ ██║  ██║ ██║    ███████╗    ██║    ███████║ ██╗
+ ╚═╝  ╚═╝ ╚═╝  ╚═╝ ╚═╝  ╚═╝ ╚═╝     ╚═╝ ╚═╝  ╚═╝ ╚═╝    ╚══════╝    ╚═╝    ╚══════╝ ╚═╝
+`;
+
+console.log('%s', intro);
+
+let argv = yargs.usage('Usage: akamai-ets [options]')
+
+    .options({
+        'o' : { alias : 'origin', description : ' Origin server host and port', type : 'string' },
+        'a' : { alias : 'alias', description : ' Origin server aliases', type : 'array', demand : false },
+        'g' : { alias : 'geo', description : ' GEO configuration options', type : 'array', demand : false }
+    })
+
+    .group(['o', 'a', 'g'], 'Options:\n')
+    .group(['v', 'h'], '')
+
+    .version(function() {
+        return require('../package').version;
+    })
+
+    .alias('v', 'version')
+
+    // HELP
+    // --------------------------
+    .help('h').alias('h', 'help')
+    .showHelpOnFail(true, 'Specify --help for available options\n')
+    .argv;
+
+process.on('uncaughtException', (err) => {
+    log('error', {
+        event : 'uncaughtException',
+        error : err
+    });
+});
+
+(function() {
+
+    let args    = pick(argv, ['origin', 'alias', 'geo']),
+
+        config  = {
+
+            origin : args.origin && `http://${url.parse(args.origin).host}/`,
+            alias  : args.alias && args.alias.length ? args.alias : false,
+            www    : process.env.ETS_WWW || process.cwd(),
+
+            // ETS server configuration
+
+            esi : {
+
+                // if we have defined GEO options, create an object to
+                // represent them
+
+                geo : (function() {
+
+                    let geo     = args.geo && parseQuery(args.geo.join('&')) || {},
+                        geoKeys = Object.keys(geo);
+
+                    return geo && !(
+                        geoKeys.includes('false') || geoKeys.includes('off')
+                    ) ? geo : false;
+
+                }())
+
+            },
+
+            // story ETS_* related port information against
+            // the config
+
+            ports : {
+                playground : process.env.ETS_PORT   || 'n/a',
+                origin     : process.env.ETS_ORIGIN || 'n/a',
+                debug      : process.env.ETS_DEBUG  || 'n/a'
+            }
+
+        };
+
+    cli(config);
+
+}());

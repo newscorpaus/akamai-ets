@@ -1,0 +1,37 @@
+@import 'https://fonts.googleapis.com/css?family=Leckerli+One';
+
+body         { overflow : hidden; }
+.fullheight  { height : calc(100vh - 105px); }
+.row         { margin-bottom: 0;}
+.row .col    { padding : 0; }
+.col.source  { border-right : 1px solid #ddd; }
+footer.page-footer {
+    height     : 40px;
+    margin-top : 0;
+}
+
+.iframe {
+    display     : block;
+    background  : #fff;
+    border      : none;
+    width       : 100%;
+}
+
+.brand-logo {
+    margin-left    : 10px;
+    font-family    : 'Leckerli One', cursive;
+    letter-spacing : 3px;
+}
+
+#toggle-debug { width : 124px; }
+
+#panel-preview {
+    -webkit-transition: opacity 1s ease-in-out;
+    -moz-transition: opacity 1s ease-in-out;
+    -o-transition: opacity 1s ease-in-out;
+    transition: opacity 1s ease-in-out;
+}
+
+#panel-preview.transparent {
+    opacity:0;
+}

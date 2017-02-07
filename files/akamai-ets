@@ -1,0 +1,64 @@
+#!/bin/sh
+
+# akamai-ets
+# A wrapper script for invoking akamai-ets with docker
+# Put this script in $PATH as `akamai-ets`
+
+PROGNAME="$(basename $0)"
+VERSION="v5.3.0-1.0.0"
+
+ETS_HTDOCS=${ETS_HTDOCS:=$PWD}
+ETS_ENTRY=${ETS_ENTRY:=akamai-ets}
+
+# Helper functions for guards
+
+error(){
+    error_code=$1
+    echo "ERROR: $2" >&2
+    echo "($PROGNAME wrapper version: $VERSION, error code: $error_code )" >&2
+    exit $1
+}
+
+check_cmd_in_path(){
+    cmd=$1
+    which $cmd > /dev/null 2>&1 || error 1 "$cmd not found!"
+}
+
+get_free_port(){
+
+    # https://github.com/docker/docker/issues/3778#issuecomment-211831177
+
+echo $(python << END
+import socket;
+s = socket.socket();
+s.bind(('', 0));
+print s.getsockname()[1];
+s.close()
+END)
+
+}
+
+# Guards (checks for dependencies)
+
+check_cmd_in_path docker
+check_cmd_in_path docker-machine
+
+ETS_WWW=${ETS_WWW:=$PWD}
+ETS_PORT=${ETS_PORT:=$(get_free_port)}
+ETS_ORIGIN=${ETS_ORIGIN:=$(get_free_port)}
+ETS_DEBUG=${ETS_DEBUG:=$(get_free_port)}
+
+# Set up mounted volumes, environment, and run our
+# containerized command
+
+docker run \
+  --interactive --tty --rm \
+  --volume "$ETS_WWW":/home/www/ \
+  -e ETS_PORT="$ETS_PORT" \
+  -e ETS_ORIGIN="$ETS_ORIGIN" \
+  -e ETS_DEBUG="$ETS_DEBUG" \
+  -e ETS_WWW="$ETS_WWW" \
+  -p $ETS_PORT:82 \
+  -p $ETS_ORIGIN:80 \
+  -p $ETS_DEBUG:81 \
+  "newscorpaus/akamai-ets:$VERSION" "$@"

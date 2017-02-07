@@ -1,0 +1,31 @@
+{
+
+    "hosts" : [
+        "origin.ets",
+        "debug.ets",
+        "origin.ets.local",
+        "debug.ets.local",
+        "playground.ets",
+        "preview.playground.ets",
+        "debug.playground.ets"
+    ],
+
+    "esi" : {
+        "geo" : {
+            "georegion"    : "246",
+            "country_code" : "US",
+            "region_code"  : "CA",
+            "city"         : "SANJOSE",
+            "dma"          : "807",
+            "pmsa"         : "7400",
+            "areacode"     : "408",
+            "county"       : "SANTACLARA",
+            "fips"         : "06085",
+            "lat"          : "37.3353",
+            "long"         : "121.8938",
+            "timezone"     : "PST",
+            "network_type" : "dialup"
+        }
+    }
+
+}

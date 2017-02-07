@@ -1,0 +1,4 @@
+--require ./test/common
+--reporter list
+--recursive
+--timeout 3000
