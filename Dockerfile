@@ -43,7 +43,7 @@ RUN cd /tmp && \
     curl http://ftp.cs.stanford.edu/pub/exim/pcre/pcre-${PCRE_VER}.tar.gz > pcre-${PCRE_VER}.tar.gz && \
     tar -xzf pcre-${PCRE_VER}.tar.gz && \
     cd /tmp/pcre-${PCRE_VER} && \
-    ./configure --prefix=/tmp/akamai-ets_6.0.0.4_Ubuntu/files/bindist \
+    ./configure --prefix=/tmp/${ETS_VER}/files/bindist \
       --enable-utf8 \
       --enable-unicode-properties \
       --build=i686-pc-linux-gnu "CFLAGS=-m32" "CXXFLAGS=-m32" "LDFLAGS=-m32" && \
