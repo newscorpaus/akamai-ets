@@ -3,6 +3,7 @@ MAINTAINER Jonathan Barnett (jonathan.barnett@news.com.au)
 
 ENV ETS_VER     akamai-ets_6.0.0.4_Ubuntu
 ENV ETS_DIR     /opt/akamai-ets
+ENV PCRE_VER    8.33
 
 ENV NODE_DIR    /usr/src/app/
 ENV HTTPD_DIR   /usr/local/apache2
@@ -26,15 +27,30 @@ RUN echo "foreign-architecture i386" > /etc/dpkg/dpkg.cfg.d/multiarch && \
     libexpat1:i386 \
     libssl1.0.0:i386 \
     libstdc++6:i386 \
-    zlibc:i386
+    zlibc:i386 \
+    gcc-multilib \
+    g++-multilib
 
 # install ets server directly bypassing default
 # installation
 
 COPY files/release/${ETS_VER}.tar.gz /tmp
 
-RUN  tar -xzf /tmp/${ETS_VER}.tar.gz -C /tmp && \
-     cd /tmp/${ETS_VER}/files && ./install-bindist.sh ${HTTPD_DIR} && \
+RUN  tar -xzf /tmp/${ETS_VER}.tar.gz -C /tmp
+
+# update existing pcre to include utf-8 support
+RUN cd /tmp && \
+    curl http://ftp.cs.stanford.edu/pub/exim/pcre/pcre-${PCRE_VER}.tar.gz > pcre-${PCRE_VER}.tar.gz && \
+    tar -xzf pcre-${PCRE_VER}.tar.gz && \
+    cd /tmp/pcre-${PCRE_VER} && \
+    ./configure --prefix=/tmp/${ETS_VER}/files/bindist \
+      --enable-utf8 \
+      --enable-unicode-properties \
+      --build=i686-pc-linux-gnu "CFLAGS=-m32" "CXXFLAGS=-m32" "LDFLAGS=-m32" && \
+    make && \
+    make install
+
+RUN  cd /tmp/${ETS_VER}/files && ./install-bindist.sh ${HTTPD_DIR} && \
      rm -rf /tmp/*
 
 RUN  ln -s ${HTTPD_DIR} ${ETS_DIR}
